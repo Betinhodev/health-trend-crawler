@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}History - Health Trend Crawler{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-title">Report History</div>
+    <div class="hero-subtitle">Last {{ reports | length }} days of trend analysis</div>
+</div>
+
+<div class="section">
+    {% if reports %}
+    {% for report in reports %}
+    <a class="history-item" href="/history/{{ report.date }}.html" style="text-decoration: none; color: inherit;">
+        <div>
+            <div style="font-weight: 600; color: var(--text-heading);">{{ report.date }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                {{ report.niches_with_data | length }} niches &middot; {{ report.run_time }}
+            </div>
+        </div>
+        <div style="text-align: right;">
+            {% if report.hottest_niche %}
+            <span class="badge badge-high">{{ report.hottest_niche | replace('_', ' ') | title }}</span>
+            {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <div class="empty">
+        <div class="empty-icon">--</div>
+        <div>No historical reports yet.</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
