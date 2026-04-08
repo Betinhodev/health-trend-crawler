@@ -1,0 +1,44 @@
+# Health Trend Crawler - Caddy Web Server Config
+#
+# OPTION 1: Access via IP (no domain needed)
+# Replace YOUR_VPS_IP with your actual VPS IP address
+#
+# OPTION 2: Access via domain (automatic HTTPS)
+# Replace the :80 line with your domain, e.g.:
+# dashboard.yourdomain.com {
+
+:80 {
+    # Serve the static dashboard files
+    root * /root/health-trend-crawler/public
+
+    # Enable file server
+    file_server
+
+    # Basic Auth protection
+    # Generate password hash with: caddy hash-password
+    # Then replace the hash below
+    basicauth {
+        gilberto $2a$14$REPLACE_WITH_CADDY_HASH_PASSWORD
+    }
+
+    # Default index file
+    try_files {path} {path}/ /index.html
+
+    # Cache static assets
+    @assets {
+        path *.css *.js *.woff2 *.png *.jpg *.svg
+    }
+    header @assets Cache-Control "public, max-age=3600"
+
+    # No cache for HTML (always fresh)
+    @html {
+        path *.html
+    }
+    header @html Cache-Control "no-cache, must-revalidate"
+
+    # Logging
+    log {
+        output file /var/log/caddy/dashboard.log
+        format console
+    }
+}
