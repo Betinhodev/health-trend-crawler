@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Health Trend Crawler{% endblock %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; --radius: 12px; --radius-sm: 8px; --transition: 0.2s ease; }
+        [data-theme="dark"] { --bg: #0a0a0f; --bg-card: #12121a; --bg-card-hover: #1a1a25; --bg-nav: #0d0d14; --text: #e4e4e7; --text-muted: #71717a; --text-heading: #fafafa; --border: #27272a; --accent: #6366f1; --accent-glow: rgba(99, 102, 241, 0.15); --red: #ef4444; --red-bg: rgba(239, 68, 68, 0.1); --yellow: #eab308; --yellow-bg: rgba(234, 179, 8, 0.1); --green: #22c55e; --green-bg: rgba(34, 197, 94, 0.1); --blue: #3b82f6; --blue-bg: rgba(59, 130, 246, 0.1); --purple: #a855f7; --purple-bg: rgba(168, 85, 247, 0.1); --orange: #f97316; --orange-bg: rgba(249, 115, 22, 0.1); --pink: #ec4899; --pink-bg: rgba(236, 72, 153, 0.1); }
+        [data-theme="light"] { --bg: #f8f9fc; --bg-card: #ffffff; --bg-card-hover: #f3f4f6; --bg-nav: #ffffff; --text: #374151; --text-muted: #6b7280; --text-heading: #111827; --border: #e5e7eb; --accent: #4f46e5; --accent-glow: rgba(79, 70, 229, 0.08); --red: #dc2626; --red-bg: rgba(220, 38, 38, 0.06); --yellow: #ca8a04; --yellow-bg: rgba(202, 138, 4, 0.06); --green: #16a34a; --green-bg: rgba(22, 163, 74, 0.06); --blue: #2563eb; --blue-bg: rgba(37, 99, 235, 0.06); --purple: #9333ea; --purple-bg: rgba(147, 51, 234, 0.06); --orange: #ea580c; --orange-bg: rgba(234, 88, 12, 0.06); --pink: #db2777; --pink-bg: rgba(219, 39, 119, 0.06); }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { background: var(--bg-nav); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text-heading); display: flex; align-items: center; gap: 8px; }
+        .nav-brand span { color: var(--accent); }
+        .nav-links { display: flex; gap: 4px; list-style: none; }
+        .nav-links a { padding: 6px 14px; border-radius: var(--radius-sm); font-size: 0.875rem; color: var(--text-muted); transition: var(--transition); }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-heading); background: var(--accent-glow); text-decoration: none; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .theme-toggle { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.875rem; }
+        .last-update { font-size: 0.75rem; color: var(--text-muted); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: var(--transition); }
+        .card:hover { background: var(--bg-card-hover); }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .card-title { font-size: 1rem; font-weight: 600; color: var(--text-heading); }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; }
+        .badge-high { background: var(--red-bg); color: var(--red); }
+        .badge-medium { background: var(--yellow-bg); color: var(--yellow); }
+        .badge-low { background: var(--green-bg); color: var(--green); }
+        .badge-fear { background: var(--red-bg); color: var(--red); }
+        .badge-desire { background: var(--green-bg); color: var(--green); }
+        .badge-curiosity { background: var(--purple-bg); color: var(--purple); }
+        .badge-authority { background: var(--blue-bg); color: var(--blue); }
+        .badge-social_proof { background: var(--orange-bg); color: var(--orange); }
+        .badge-rising { background: var(--green-bg); color: var(--green); }
+        .badge-stable { background: var(--blue-bg); color: var(--blue); }
+        .badge-declining { background: var(--red-bg); color: var(--red); }
+        .score { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; font-size: 0.8rem; font-weight: 700; }
+        .score-high { background: var(--red-bg); color: var(--red); }
+        .score-medium { background: var(--yellow-bg); color: var(--yellow); }
+        .score-low { background: var(--green-bg); color: var(--green); }
+        .section { margin-bottom: 32px; }
+        .section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-heading); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .hero { background: linear-gradient(135deg, var(--accent-glow), transparent); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
+        .hero-title { font-size: 1.5rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px; }
+        .hero-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+        .hero-briefing { font-size: 1rem; line-height: 1.7; color: var(--text); }
+        .hot-niche { display: inline-flex; align-items: center; gap: 6px; background: var(--red-bg); color: var(--red); padding: 4px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+        .niche-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: var(--transition); cursor: pointer; text-decoration: none; color: inherit; display: block; }
+        .niche-card:hover { background: var(--bg-card-hover); border-color: var(--accent); text-decoration: none; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .niche-card-name { font-weight: 700; font-size: 1.05rem; color: var(--text-heading); margin-bottom: 8px; }
+        .niche-card-stat { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .angle-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .angle-row:last-child { border-bottom: none; }
+        .angle-number { font-size: 1.2rem; font-weight: 800; color: var(--accent); min-width: 28px; }
+        .angle-content { flex: 1; }
+        .angle-text { font-size: 0.95rem; color: var(--text-heading); margin-bottom: 4px; }
+        .angle-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .article-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .article-item:last-child { border-bottom: none; }
+        .article-title { font-size: 0.9rem; font-weight: 500; color: var(--text-heading); margin-bottom: 4px; }
+        .article-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 12px; }
+        .history-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; transition: var(--transition); }
+        .history-item:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+        tr:hover td { background: var(--accent-glow); }
+        @media (max-width: 768px) { .nav-links { display: none; } .container { padding: 16px; } .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; } .hero { padding: 20px; } .hero-title { font-size: 1.2rem; } }
+        .empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+        .empty-icon { font-size: 2rem; margin-bottom: 12px; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-brand"><span>HTC</span> Health Trend Crawler</div>
+            <ul class="nav-links">
+                <a href="/index.html" class="{% if active_page == 'home' %}active{% endif %}">Dashboard</a>
+                <a href="/niche_memory.html" class="{% if active_page == 'memory' %}active{% endif %}">Memory</a>
+                <a href="/niche_joint_pain.html" class="{% if active_page == 'joint_pain' %}active{% endif %}">Joint Pain</a>
+                <a href="/niche_neuropathy.html" class="{% if active_page == 'neuropathy' %}active{% endif %}">Neuropathy</a>
+                <a href="/niche_weight_loss.html" class="{% if active_page == 'weight_loss' %}active{% endif %}">Weight Loss</a>
+                <a href="/niche_type2_diabetes.html" class="{% if active_page == 'type2_diabetes' %}active{% endif %}">Type 2</a>
+                <a href="/history/index.html" class="{% if active_page == 'history' %}active{% endif %}">History</a>
+            </ul>
+            <div class="nav-right">
+                <span class="last-update">Updated: {{ last_update }}</span>
+                <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container">{% block content %}{% endblock %}</div>
+    <script>
+        function toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const next = current === 'dark' ? 'light' : 'dark'; html.setAttribute('data-theme', next); localStorage.setItem('theme', next); }
+        const saved = localStorage.getItem('theme'); if (saved) document.documentElement.setAttribute('data-theme', saved);
+    </script>
+</body>
+  </html>
