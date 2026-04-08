@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}{{ niche_name | replace('_', ' ') | title }} - Health Trend Crawler{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-subtitle">{{ date }} &mdash; {{ run_time }} EST</div>
+    <div class="hero-title">{{ niche_name | replace('_', ' ') | title }}</div>
+    {% if report %}
+    <div class="hero-briefing">{{ report.summary | default('No summary available.') }}</div>
+    <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+        {{ report.total_articles_analyzed | default(0) }} articles analyzed
+    </div>
+    {% else %}
+    <div class="hero-briefing">No data available for this niche yet. Run the pipeline to collect data.</div>
+    {% endif %}
+</div>
+
+{% if report %}
+
+<!-- TOP 3 COPY ANGLES -->
+{% if report.top_3_copy_angles %}
+<div class="section">
+    <div class="section-title">Copy Angles</div>
+    <div class="grid-3">
+        {% for angle in report.top_3_copy_angles %}
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-{{ angle.type | default('curiosity') }}">{{ angle.type | default('N/A') }}</span>
+            </div>
+            <div class="card-title" style="margin-bottom: 8px;">{{ angle.angle | default('') }}</div>
+            <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; font-weight: 500;">
+                "{{ angle.example_headline | default('') }}"
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                Target emotion: {{ angle.target_emotion | default('N/A') }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- TRENDING TOPICS -->
+{% if report.trending_topics %}
+<div class="section">
+    <div class="section-title">Trending Topics</div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Score</th>
+                    <th>Topic</th>
+                    <th>Sources</th>
+                    <th>Consumer Angle</th>
+                    <th>Copy Hooks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topic in report.trending_topics | sort(attribute='relevance_score', reverse=True) %}
+                <tr>
+                    <td>
+                        {% set score = topic.relevance_score | default(5) %}
+                        <span class="score {% if score >= 8 %}score-high{% elif score >= 5 %}score-medium{% else %}score-low{% endif %}">
+                            {{ score }}
+                        </span>
+                    </td>
+                    <td style="font-weight: 500; color: var(--text-heading);">{{ topic.topic }}</td>
+                    <td>{{ topic.sources_count | default(0) }}</td>
+                    <td>{{ topic.consumer_angle | default('') }}</td>
+                    <td>
+                        {% for hook in topic.copy_hook_ideas | default([]) %}
+                        <div style="margin-bottom: 4px; font-size: 0.8rem;">{{ hook }}</div>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- CELEBRITY MENTIONS -->
+{% if report.celebrity_mentions %}
+<div class="section">
+    <div class="section-title">Celebrity Mentions</div>
+    <div class="grid-2">
+        {% for celeb in report.celebrity_mentions %}
+        <div class="card">
+            <div class="card-title" style="margin-bottom: 8px;">{{ celeb.celebrity }}</div>
+            <div style="font-size: 0.9rem; margin-bottom: 8px;">{{ celeb.context | default('') }}</div>
+            <div style="font-size: 0.85rem; color: var(--accent); font-weight: 500;">
+                Copy potential: {{ celeb.copy_potential | default('N/A') }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- NEW STUDIES / DISCOVERIES -->
+{% if report.new_studies_or_discoveries %}
+<div class="section">
+    <div class="section-title">New Studies & Discoveries</div>
+    <div class="grid-2">
+        {% for study in report.new_studies_or_discoveries %}
+        <div class="card">
+            <div class="card-title" style="margin-bottom: 8px;">{{ study.finding }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                Source: {{ study.source | default('N/A') }}
+            </div>
+            <div style="font-size: 0.9rem; color: var(--accent); font-weight: 500;">
+                Headline: "{{ study.headline_angle | default('') }}"
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- PRODUCT TRENDS -->
+{% if report.product_trends %}
+<div class="section">
+    <div class="section-title">Product Trends</div>
+    <div class="grid-3">
+        {% for product in report.product_trends %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">{{ product.product_or_ingredient }}</div>
+                <span class="badge badge-{{ product.trend_direction | default('stable') }}">
+                    {{ product.trend_direction | default('stable') }}
+                </span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">{{ product.context | default('') }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ARTICLES COLLECTED -->
+{% if articles %}
+<div class="section">
+    <div class="section-title">Articles Collected ({{ articles | length }})</div>
+    <div class="card">
+        {% for art in articles[:30] %}
+        <div class="article-item">
+            <div class="article-title">
+                <a href="{{ art.url }}" target="_blank" rel="noopener">{{ art.title }}</a>
+            </div>
+            <div class="article-meta">
+                <span>{{ art.source }}</span>
+                <span>Keyword: {{ art.matched_keyword }}</span>
+                <span>{{ art.published | default('') }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% if articles | length > 30 %}
+        <div style="padding: 12px 0; color: var(--text-muted); font-size: 0.85rem;">
+            ... and {{ articles | length - 30 }} more articles
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty">
+    <div class="empty-icon">--</div>
+    <div>No data available for this niche.</div>
+    <div style="margin-top: 8px;">Run the pipeline to start collecting trend data.</div>
+</div>
+{% endif %}
+{% endblock %}
