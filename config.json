@@ -1,0 +1,108 @@
+{
+  "schedule": {
+    "runs_per_day": 2,
+    "times_est": ["08:00", "18:00"],
+    "timezone": "America/New_York"
+  },
+
+  "niches": {
+    "memory": {
+      "keywords": [
+        "memory loss", "alzheimer", "dementia", "brain fog",
+        "cognitive decline", "brain health", "memory supplement",
+        "mental clarity", "brain function", "forgetfulness"
+      ]
+    },
+    "joint_pain": {
+      "keywords": [
+        "joint pain", "chronic pain", "pain relief", "anti-inflammatory",
+        "fibromyalgia", "arthritis", "knee pain", "back pain",
+        "muscle pain", "joint supplement", "joint health"
+      ]
+    },
+    "neuropathy": {
+      "keywords": [
+        "neuropathy", "nerve pain", "nerve damage", "tingling",
+        "numbness", "peripheral neuropathy", "diabetic neuropathy",
+        "nerve health", "nerve supplement"
+      ]
+    },
+    "weight_loss": {
+      "keywords": [
+        "weight loss", "metabolism", "ozempic", "monjaro",
+        "burn fat", "diet", "obesity", "GLP-1", "wegovy",
+        "semaglutide", "tirzepatide", "appetite suppressant",
+        "fat burner", "lose weight", "bariatric"
+      ]
+    },
+    "type2_diabetes": {
+      "keywords": [
+        "type 2 diabetes", "blood sugar", "metformin", "insulin",
+        "glucose", "reverse diabetes", "A1C", "prediabetes",
+        "diabetic", "sugar levels", "glycemia", "insulin resistance"
+      ]
+    }
+  },
+
+  "sites": {
+    "gossip": [
+      {"name": "TMZ", "domain": "tmz.com", "url": "https://www.tmz.com/"},
+      {"name": "Page Six", "domain": "pagesix.com", "url": "https://pagesix.com/"},
+      {"name": "Perez Hilton", "domain": "perezhilton.com", "url": "https://perezhilton.com/"},
+      {"name": "Radar Online", "domain": "radaronline.com", "url": "https://radaronline.com/"},
+      {"name": "The Blast", "domain": "theblast.com", "url": "https://theblast.com/"},
+      {"name": "Hollywood Life", "domain": "hollywoodlife.com", "url": "https://hollywoodlife.com/"},
+      {"name": "Just Jared", "domain": "justjared.com", "url": "https://www.justjared.com/"},
+      {"name": "US Weekly", "domain": "usmagazine.com", "url": "https://www.usmagazine.com/"},
+      {"name": "In Touch Weekly", "domain": "intouchweekly.com", "url": "https://www.intouchweekly.com/"},
+      {"name": "Lainey Gossip", "domain": "laineygossip.com", "url": "https://www.laineygossip.com/"},
+      {"name": "OK Magazine", "domain": "okmagazine.com", "url": "https://okmagazine.com/"},
+      {"name": "Dlisted", "domain": "dlisted.com", "url": "https://dlisted.com/"},
+      {"name": "Blind Gossip", "domain": "blindgossip.com", "url": "https://blindgossip.com/"},
+      {"name": "Naughty Gossip", "domain": "naughtygossip.com", "url": "https://www.naughtygossip.com/"},
+      {"name": "Bossip", "domain": "bossip.com", "url": "https://bossip.com/"},
+      {"name": "Celebuzz", "domain": "celebuzz.com", "url": "https://www.celebuzz.com/"},
+      {"name": "MediaTakeOut", "domain": "mediatakeout.com", "url": "https://mediatakeout.com/"},
+      {"name": "Gawker", "domain": "gawker.com", "url": "https://www.gawker.com/"},
+      {"name": "Crazy Days and Nights", "domain": "crazydaysandnights.net", "url": "https://www.crazydaysandnights.net/"},
+      {"name": "Star Magazine", "domain": "starmagazine.com", "url": "https://starmagazine.com/"}
+    ],
+    "health": [
+      {"name": "Healthline", "domain": "healthline.com", "url": "https://www.healthline.com/"},
+      {"name": "WebMD", "domain": "webmd.com", "url": "https://www.webmd.com/"},
+      {"name": "CNN Health", "domain": "cnn.com/health", "url": "https://www.cnn.com/health"},
+      {"name": "NBC Health", "domain": "nbcnews.com/health", "url": "https://www.nbcnews.com/health"},
+      {"name": "ScienceDaily", "domain": "sciencedaily.com", "url": "https://www.sciencedaily.com/"},
+      {"name": "Medical News Today", "domain": "medicalnewstoday.com", "url": "https://www.medicalnewstoday.com/"},
+      {"name": "Mayo Clinic News", "domain": "newsnetwork.mayoclinic.org", "url": "https://newsnetwork.mayoclinic.org/"},
+      {"name": "NIH News", "domain": "nih.gov/news-events", "url": "https://www.nih.gov/news-events"}
+    ]
+  },
+
+  "dashboard": {
+    "public_dir": "public",
+    "templates_dir": "templates",
+    "title": "Health Trend Crawler",
+    "auth_user": "gilberto",
+    "auth_password_hash": "SET_VIA_CADDY_HASH"
+  },
+
+  "crawler": {
+    "max_articles_per_query": 10,
+    "max_articles_per_niche": 30,
+    "article_max_chars": 3000,
+    "request_delay_seconds": 2,
+    "request_timeout_seconds": 15,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  },
+
+  "analyzer": {
+    "model": "sonnet",
+    "max_tokens_per_analysis": 4000
+  },
+
+  "output": {
+    "local_dir": "data/reports",
+    "keep_days": 30
+  }
+}
