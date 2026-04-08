@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Health Trend Crawler{% endblock %}
+
+{% block content %}
+<!-- HERO / DAILY BRIEFING -->
+<div class="hero">
+    <div class="hero-subtitle">{{ date }} &mdash; {{ run_time }} EST</div>
+    {% if daily_summary %}
+    <div class="hot-niche">Hottest: {{ daily_summary.hottest_niche_today | default('N/A') | replace('_', ' ') | title }}</div>
+    <div class="hero-briefing">{{ daily_summary.daily_briefing | default('No briefing available for this run.') }}</div>
+    {% else %}
+    <div class="hero-title">Waiting for data...</div>
+    <div class="hero-briefing">No analysis has been generated yet. Run the pipeline to see results.</div>
+    {% endif %}
+</div>
+
+{% if daily_summary %}
+<!-- TOP ACTIONABLE ANGLES -->
+<div class="section">
+    <div class="section-title">Top Actionable Angles</div>
+    <div class="card">
+        {% for angle in daily_summary.top_5_actionable_angles | default([]) %}
+        <div class="angle-row">
+            <div class="angle-number">{{ loop.index }}</div>
+            <div class="angle-content">
+                <div class="angle-text">{{ angle.angle }}</div>
+                <div class="angle-meta">
+                    <span class="badge badge-{{ angle.urgency | default('low') }}">{{ angle.urgency | default('low') | upper }}</span>
+                    <span>{{ angle.niche | replace('_', ' ') | title }}</span>
+                    <span style="color: var(--text-muted)">{{ angle.why | default('') }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not daily_summary.top_5_actionable_angles %}
+        <div class="empty"><div class="empty-icon">--</div>No angles generated</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- CROSS-NICHE TRENDS -->
+{% if daily_summary.cross_niche_trends %}
+<div class="section">
+    <div class="section-title">Cross-Niche Trends</div>
+    <div class="grid-3">
+        {% for trend in daily_summary.cross_niche_trends %}
+        <div class="card">
+            <div class="card-title">{{ trend }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- NICHE OVERVIEW CARDS -->
+<div class="section">
+    <div class="section-title">Niches</div>
+    <div class="grid-5">
+        {% for niche_key, niche_report in niche_reports.items() %}
+        <a class="niche-card" href="/niche_{{ niche_key }}.html">
+            <div class="niche-card-name">{{ niche_key | replace('_', ' ') | title }}</div>
+            {% if niche_report %}
+            <div class="niche-card-stat">{{ niche_report.total_articles_analyzed | default(0) }} articles</div>
+            <div class="niche-card-stat">{{ niche_report.trending_topics | default([]) | length }} topics</div>
+            <div class="niche-card-stat">{{ niche_report.top_3_copy_angles | default([]) | length }} angles</div>
+            {% else %}
+            <div class="niche-card-stat">No data yet</div>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- QUICK VIEW: ALL TOP ANGLES BY NICHE -->
+<div class="section">
+    <div class="section-title">All Copy Angles Today</div>
+    <div class="grid-2">
+        {% for niche_key, niche_report in niche_reports.items() %}
+        {% if niche_report and niche_report.top_3_copy_angles %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">{{ niche_key | replace('_', ' ') | title }}</div>
+            </div>
+            {% for angle in niche_report.top_3_copy_angles %}
+            <div class="angle-row">
+                <div class="angle-number">{{ loop.index }}</div>
+                <div class="angle-content">
+                    <div class="angle-text">{{ angle.example_headline | default(angle.angle) }}</div>
+                    <div class="angle-meta">
+                        <span class="badge badge-{{ angle.type | default('curiosity') }}">{{ angle.type | default('') }}</span>
+                        <span>{{ angle.target_emotion | default('') }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
